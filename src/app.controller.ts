@@ -1,12 +1,13 @@
-import { Body, Controller, Post, Get } from '@nestjs/common'
+import { Body, Controller, Post, Get, Put } from '@nestjs/common'
 import { ConfigModule } from "@nestjs/config"
 import configuration from './configuration/configuration'
 import { RmqModule } from './rmq/rmq.module'
 import { NEW_ORDER_FROM_VTEX } from './constants/services'
 import NewOrderService from './app.service'
 import { CreateNewOrderDTO } from './dto/CreateNewOrderDTO'
+import { ModifyOrderStatusDTO } from './dto/modifyOrderStatus'
 
-@Controller("newOrder")
+@Controller()
 export default class NewOrderController {
     constructor(private readonly newOrderService: NewOrderService ){}
 
@@ -15,7 +16,7 @@ export default class NewOrderController {
         //TODO: Crear Endpoint para crear ordenes por medio de POST
     }
 
-    @Get()
+    @Get("newOrder")
     async automaticCreateNewOrder(): Promise<any> {
         try {
             console.log("inicia")
@@ -28,6 +29,12 @@ export default class NewOrderController {
         }
         return 200
 
+    }
+
+    @Put()
+    async modifyOrderStatus(@Body() body: ModifyOrderStatusDTO) {
+        this.newOrderService.modifyOrder(body);
+        return 200
     }
 
 

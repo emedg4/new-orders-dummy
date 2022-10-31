@@ -1,12 +1,15 @@
 import { Inject, Injectable, Logger } from '@nestjs/common'
-import { NEW_ORDER_FROM_VTEX } from './constants/services'
+import { MODIFY_ORDERS, NEW_ORDER_FROM_VTEX } from './constants/services'
 import { CreateNewOrderDTO } from './dto/CreateNewOrderDTO'
 import { MetodoPago, Tienda, MetodoEnvio, Cliente, Vitrina, EstatusPago } from "./constants/PedidoData"
 import { ClientProxy } from '@nestjs/microservices'
+import { ModifyOrderStatusDTO } from './dto/modifyOrderStatus'
 @Injectable()
 export default class NewOrderService {
     private readonly logger : Logger
-    constructor(@Inject(NEW_ORDER_FROM_VTEX) private newOrderClient: ClientProxy){
+    constructor(
+        @Inject(MODIFY_ORDERS) private modifyOrderClient: ClientProxy,
+        @Inject(NEW_ORDER_FROM_VTEX) private newOrderClient: ClientProxy){
         this.logger = new Logger(NewOrderService.name)
 
     }
@@ -18,6 +21,14 @@ export default class NewOrderService {
         this.newOrderClient.emit("newOrder", order)
         this.logger.log(order, "Creacion de nuevo Pedido")
         return
+    }
+
+    public modifyOrder(data: ModifyOrderStatusDTO){
+        this.modifyOrderClient.emit("modifyOrder", data)
+        this.logger.log(`Modified order ${data.pedido} status from ${data.status_previo} to ${data.status_nuevo} `)
+
+        return
+
     }
 
 
@@ -73,5 +84,7 @@ export default class NewOrderService {
         return num
 
     }
+
+
 
 }
