@@ -70,7 +70,8 @@ export default class NewOrderController {
     }
 
     @Delete(DELETE_TENANT)
-    async deleteTenant(){
+    async deleteTenant(@Body() body: CreateTenant){
+        return await this.newOrderService.deleteTenant(body.name)
 
     }
 

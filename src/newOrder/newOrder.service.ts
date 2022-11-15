@@ -123,8 +123,8 @@ export default class NewOrderService {
 
     }
 
-    public async deleteTenant(){
-
+    public async deleteTenant( name: string ){
+        return await this.newOrderModel.delete(name)
     }
 
     public async modifyTenant(){
