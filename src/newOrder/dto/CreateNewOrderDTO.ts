@@ -15,4 +15,6 @@ export class CreateNewOrderDTO {
     public vitrina: string;
 
     public estatus_pago: string;
+
+    public tenant: string;
 }

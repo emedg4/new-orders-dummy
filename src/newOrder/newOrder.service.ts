@@ -1,13 +1,15 @@
 import { Inject, Injectable, Logger } from '@nestjs/common'
-import { MODIFY_ORDERS, NEW_ORDER_FROM_VTEX } from './constants/services'
+import { MODIFY_ORDERS, NEW_ORDER_FROM_VTEX } from './constant/services'
 import { CreateNewOrderDTO } from './dto/CreateNewOrderDTO'
-import { MetodoPago, Tienda, MetodoEnvio, Cliente, Vitrina, EstatusPago } from "./constants/PedidoData"
+import { MetodoPago, Tienda, MetodoEnvio, Cliente, Vitrina, EstatusPago } from "./constant/PedidoData"
 import { ClientProxy } from '@nestjs/microservices'
 import { ModifyOrderStatusDTO } from './dto/modifyOrderStatus'
+import { NewOrderModel } from './newOrder.model'
 @Injectable()
 export default class NewOrderService {
     private readonly logger : Logger
     constructor(
+        private newOrderModel: NewOrderModel,
         @Inject(MODIFY_ORDERS) private modifyOrderClient: ClientProxy,
         @Inject(NEW_ORDER_FROM_VTEX) private newOrderClient: ClientProxy){
         this.logger = new Logger(NewOrderService.name)
@@ -54,18 +56,25 @@ export default class NewOrderService {
         n = this.randomNumberGenerator(EstatusPago.length);
         const estatus_pago: string = EstatusPago[n];
 
+        const tenant: any = await this.getTenant()
 
-        const order: CreateNewOrderDTO = {
-            pedido: pedido,
-            metodo_pago: metodoPago,
-            tienda: tienda,
-            metodo_envio: metodoEnvio,
-            cliente: cliente,
-            fecha_creacion: new Date(),
-            vitrina: vitrina,
-            estatus_pago: estatus_pago
+        if(tenant === null){
+            return null;
+        }else{
+
+            const order: CreateNewOrderDTO = {
+                pedido: pedido,
+                metodo_pago: metodoPago,
+                tienda: tienda,
+                metodo_envio: metodoEnvio,
+                cliente: cliente,
+                fecha_creacion: new Date(),
+                vitrina: vitrina,
+                estatus_pago: estatus_pago,
+                tenant: tenant
+            }
+            return order;
         }
-        return order;
     }
 
     private async orderNumberGenerator(): Promise<string> {
@@ -83,6 +92,47 @@ export default class NewOrderService {
         
         return num
 
+    }
+
+    private async getTenant(){
+        const tenants: Array<any> = await this.newOrderModel.getAll()
+        const n = this.randomNumberGenerator(tenants.length);
+        const tenant: any = tenants[n];
+
+        if(tenant == undefined){
+            return null
+        }
+        else{
+            return tenant
+        }
+    }
+
+    public async createTenant( name: string ){
+        const exists = await this.newOrderModel.findByName(name);
+
+        if(exists[0] == undefined){
+
+            const createdTenant = await this.newOrderModel.create(name);
+            this.logger.log(`Tenant created: ${createdTenant}`);
+    
+            return createdTenant;
+        }
+        else{
+            return 200
+        }
+
+    }
+
+    public async deleteTenant(){
+
+    }
+
+    public async modifyTenant(){
+
+    }
+
+    public async getAllTenants(){
+        return await this.newOrderModel.getAll();
     }
 
 

@@ -1,0 +1,16 @@
+version: '3.8'
+services:
+  vtex-new-orders:
+    container_name: vtex-new-orders
+    image: postgres:14.1-alpine
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    ports:
+      - '5435:5432'
+    volumes: 
+      - ./postgres/db:/var/lib/postgresql/data
+volumes:
+  db:
+    driver: local
