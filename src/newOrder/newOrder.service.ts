@@ -5,6 +5,7 @@ import { MetodoPago, Tienda, MetodoEnvio, Cliente, Vitrina, EstatusPago } from "
 import { ClientProxy } from '@nestjs/microservices'
 import { ModifyOrderStatusDTO } from './dto/modifyOrderStatus'
 import { NewOrderModel } from './newOrder.model'
+import { TenantEntity } from './entities/tenants.entity'
 @Injectable()
 export default class NewOrderService {
     private readonly logger : Logger
@@ -97,13 +98,13 @@ export default class NewOrderService {
     private async getTenant(){
         const tenants: Array<any> = await this.newOrderModel.getAll()
         const n = this.randomNumberGenerator(tenants.length);
-        const tenant: any = tenants[n];
+        const tenant: TenantEntity = tenants[n];
 
         if(tenant == undefined){
             return null
         }
         else{
-            return tenant
+            return tenant.nombre
         }
     }
 
