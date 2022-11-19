@@ -1,14 +1,14 @@
 version: '3.8'
 services:
-  app:
-    container_name: new-orders-dummy
-    build:
-      context: .
-    restart: always
-    ports:
-      - '4001:3000'
+  # app:
+  #   container_name: new-orders-app
+  #   build:
+  #     context: .
+  #   restart: always
+  #   ports:
+  #     - '4001:3000'
   vtex-new-orders:
-    container_name: vtex-new-orders
+    container_name: vtex-new-orders-db
     image: postgres:14.1-alpine
     restart: always
     environment:
